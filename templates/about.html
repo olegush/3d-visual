@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+{% block title %}Главная{% endblock %}
+{% block content %}
+    <style>
+        canvas {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+
+    <div class="container">
+        <div style="position: absolute; top: 30%">
+            <h1 class="text-white">Veronika Vysokozerskaia</h1>
+            <br>
+            <p1 class="text-white">Hi! I'm a developer.</p1>
+            <br><br>
+            <h3 class="text-white">Skills</h3>
+            <p class="text-white">HTML / CSS /JavaScript / three.js / jQuery / Adobe PS / Python / Flask / PostgreSQL / MySQL</p>
+            <br>
+            <h3 class="text-white">Contact</h3>
+            <p class="text-white">blabla@email.com</p>
+        </div>
+    </div>
+    <script src="static/js/three.min.js"></script>
+    <script>
+      var scene, camera, renderer, boxes;
+      var amountOfBoxes = 50;
+      var size = 4;
+      var speed = .075;
+      var colorC = new THREE.Color("#8a1c3c");
+      var colorCSpec = new THREE.Color("#000373");
+      var material = new THREE.MeshPhongMaterial({
+        color: colorC.getHex(),
+        specular: colorCSpec.getHex(),
+        shininess: 20
+      });
+
+      function initScene() {
+        scene = new THREE.Scene();
+        camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.4, 1000);
+        camera.position.x = (amountOfBoxes - 1) * size / 2;
+        camera.position.z = 30;
+        camera.rotation.x = .80;
+
+        renderer = new THREE.WebGLRenderer({alpha: true});
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+      }
+
+      function createBoxes() {
+        boxes = [];
+        for (var i = 0; i < amountOfBoxes; i++) {
+          for (var j = 0; j < amountOfBoxes; j++) {
+            var r = new Box(i, j);
+            boxes.push(r);
+          }
+        }
+      }
+
+      function initLights() {
+        var light = new THREE.DirectionalLight(0xFFFFFF, 1, 0, 2);
+        light.position.set(-40, 100, 80);
+        scene.add(light);
+
+        var light = new THREE.HemisphereLight(0xFFFFFF, 0xFFFFFF, 1);
+        light.position.set(40, 40, 10);
+        scene.add(light);
+      }
+
+      function Box(x, y) {
+        // init
+        var boxSpeed = speed;
+        var zPos = (size * 2 / (amountOfBoxes + amountOfBoxes - 1)) * (x + y);
+        var geometry = new THREE.BoxGeometry(size, size, size);
+        var box = new THREE.Mesh(geometry, material);
+        scene.add(box);
+
+        // position cube
+        box.position.x = x * size;
+        box.position.y = y * size;
+        box.position.z = Math.sin(zPos) * size;
+
+        this.updatePosition = function () {
+          if (zPos + boxSpeed > 2 * Math.pi) {
+            zPos = 0
+          }
+          zPos += boxSpeed;
+          box.position.z = Math.sin(zPos) * size;
+        }
+        this.mesh = box;
+      }
+
+      function updateBoxes() {
+        for (var i = 0; i < boxes.length; i++) {
+          boxes[i].updatePosition();
+        }
+      }
+
+      function render() {
+        requestAnimationFrame(render);
+        renderer.render(scene, camera);
+        updateBoxes();
+      }
+
+
+      function resize() {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      }
+
+
+      window.addEventListener("resize", resize);
+
+      initScene();
+      initLights();
+      createBoxes();
+      render();
+    </script>
+
+{% endblock %}

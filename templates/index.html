@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Главная{% endblock %}
+{% block content %}
+
+    <script src="static/js/three.min.js"></script>
+    <script src="static/js/app.js"></script>
+    <script>
+      var loader = new THREE.FileLoader();
+      loader.load('static/app.json', function (text) {
+
+        var player = new APP.Player();
+        player.load(JSON.parse(text));
+        player.setSize(window.innerWidth, window.innerHeight);
+        player.play();
+
+        document.body.appendChild(player.dom);
+
+        window.addEventListener('resize', function () {
+          player.setSize(window.innerWidth, window.innerHeight);
+        });
+
+      });
+    </script>
+{% endblock %}
